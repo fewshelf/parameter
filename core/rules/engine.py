@@ -11,11 +11,12 @@ PACKS = {
     "privacy_light": PRIVACY_LIGHT_PACK,
 }
 
+
 def run_rulepacks(text: str, profiles: List[str]) -> List[RuleMatch]:
-    all_findings = []
+    findings: List[RuleMatch] = []
     for p in profiles:
         pack = PACKS.get(p)
         if not pack:
             continue
-        all_findings.extend(pack.run(text))
-    return all_findings
+        findings.extend(pack.run(text))
+    return findings
