@@ -1,9 +1,11 @@
 # core/rules/base.py
-from typing import List, Dict, Any
+from typing import List
 import re
 
+
 class RuleMatch:
-    def __init__(self, code: str, message: str, start: int, end: int, severity: str, profile: str):
+    def __init__(self, code: str, message: str, start: int, end: int,
+                 severity: str, profile: str):
         self.code = code
         self.message = message
         self.start = start
@@ -11,15 +13,27 @@ class RuleMatch:
         self.severity = severity
         self.profile = profile
 
+    def to_dict(self):
+        return {
+            "code": self.code,
+            "message": self.message,
+            "start": self.start,
+            "end": self.end,
+            "severity": self.severity,
+            "profile": self.profile,
+        }
+
+
 class Rule:
-    def __init__(self, code: str, pattern: str, message: str, severity: str = "MEDIUM"):
+    def __init__(self, code: str, pattern: str, message: str,
+                 severity: str = "MEDIUM"):
         self.code = code
         self.regex = re.compile(pattern, re.IGNORECASE)
         self.message = message
         self.severity = severity
 
-    def apply(self, text: str, profile: str) -> List[RuleMatch]:
-        matches = []
+    def apply(self, text: str, profile: str) -> List["RuleMatch"]:
+        matches: List[RuleMatch] = []
         for m in self.regex.finditer(text):
             matches.append(
                 RuleMatch(
@@ -28,10 +42,11 @@ class Rule:
                     start=m.start(),
                     end=m.end(),
                     severity=self.severity,
-                    profile=profile
+                    profile=profile,
                 )
             )
         return matches
+
 
 class RulePack:
     def __init__(self, name: str, rules: List[Rule]):
@@ -39,7 +54,7 @@ class RulePack:
         self.rules = rules
 
     def run(self, text: str) -> List[RuleMatch]:
-        findings = []
+        findings: List[RuleMatch] = []
         for r in self.rules:
             findings.extend(r.apply(text, self.name))
         return findings
